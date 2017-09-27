@@ -5,14 +5,41 @@
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
 <script type="text/javascript">
+  // https://stackoverflow.com/a/21903119/967478
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : sParameterName[1];
+          }
+      }
+  };
+
   $(document).ready(function () {
-      console.log("Here");
+    var code = getUrlParameter('code');
+    if (code) {
+      console.log("True");
+
+      $.post('https://github.com/login/oauth/access_token', {
+        client_id: '898ed76c7df9a6f77ed2',
+        client_secret: '492747204c3da3f01f7683a65bab32380d9309d7',
+        code: code
+      }, function (data) {
+        console.log("Fetched", data);
+      });
+    }
   });
 </script>
 </head>
 <body>
 Hello World
 <br/>
-Click <a href='http://github.com/login/oauth/authorize'>here</a> to authenticate
+Click <a href='http://github.com/login/oauth/authorize?client_id=898ed76c7df9a6f77ed2'>here</a> to authenticate
 </body>
 </html>
