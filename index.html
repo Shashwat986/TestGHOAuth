@@ -21,25 +21,82 @@
       }
   };
 
+  var f_step2_clicked = function () {
+    console.log("Access Token Downloaded");
+    $(".steps").hide();
+    $("#p_step3").show();
+  }
+
+  var b_step3_clicked = function () {
+    var access_token_raw = $("#i_access_query").val();
+    var access_token = null;
+    if (access_token_raw.indexOf("access_token=") !== -1) {
+      access_token = access_token_raw.split("access_token=")[1].split("&")[0];
+    } else if (access_token_raw.indexOf("=") === -1) {
+      // The user has copied just the access token (possibly).
+      access_token = access_token_raw;
+    } else {
+      console.log("Some error has occourred");
+    }
+
+    if (access_token) {
+      console.log("Access token: ", access_token);
+
+      $.getJSON('https://api.github.com/user', {
+        access_token: access_token
+      }, function (data) {
+        console.log("Success");
+
+        $("#s_username").html(data.login);
+
+        $(".steps").hide();
+        $("#p_step4").show();
+      });
+    }
+  }
+
   $(document).ready(function () {
+    $(".steps").hide();
+    $("#p_step1").show();
     var code = getUrlParameter('code');
     if (code) {
-      console.log("True");
+      console.log("Code Received");
+      $("#h_code").val(code);
+      $(".steps").hide();
+      $("#f_step2").show();
 
-      $.post('https://github.com/login/oauth/access_token', {
-        client_id: '898ed76c7df9a6f77ed2',
-        client_secret: '492747204c3da3f01f7683a65bab32380d9309d7',
-        code: code
-      }, function (data) {
-        console.log("Fetched", data);
-      });
+      /*
+        $.post('https://github.com/login/oauth/access_token', {
+          client_id: '898ed76c7df9a6f77ed2',
+          client_secret: '21e2fe1e8da184082bdaf9a8ceb2965b7ad38c88',
+          code: code
+        }, function (data) {
+          console.log("Fetched", data);
+        });
+      */
     }
   });
 </script>
 </head>
 <body>
 Hello World
-<br/>
+<p id="p_step1" class="steps">
 Click <a href='http://github.com/login/oauth/authorize?client_id=898ed76c7df9a6f77ed2'>here</a> to authenticate
+</p>
+<form method="POST" id="f_step2" class="steps" action="https://github.com/login/oauth/access_token">
+  <input type="hidden" id="h_code" name="code">
+  <input type="hidden" name="client_id" value="898ed76c7df9a6f77ed2">
+  <input type="hidden" name="client_secret" value="21e2fe1e8da184082bdaf9a8ceb2965b7ad38c88">
+  <input type="hidden" name="redirect_uri" value="https://shashwat986.github.io/TestGHOAuth/index.html">
+  Now click <input type="submit" value="Here" onclick="f_step2_clicked()">
+</form>
+<p id="p_step3" class="steps">
+  Finally, open the downloaded file, and paste its contents here:
+  <input id="i_access_query" type="text">
+  <button id="b_step3" onclick="b_step3_clicked()">Submit</button>
+</p>
+<p id="p_step4" class="steps">
+  This is your Github Username: <span id="s_username"></span>
+</p>
 </body>
 </html>
